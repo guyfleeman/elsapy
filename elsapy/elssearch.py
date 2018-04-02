@@ -82,7 +82,7 @@ class ElsSearch:
             all results for the search, up to a maximum of 5,000."""
         ## TODO: add exception handling
 
-        api_response = els_client.exec_request(self._path, {u"query": self._query})
+        api_response = els_client.exec_request_with_params(self._path, {u"query": self._query})
 
         total_num_results = int(api_response['search-results']['opensearch:totalResults'])
         results = api_response['search-results']['entry']

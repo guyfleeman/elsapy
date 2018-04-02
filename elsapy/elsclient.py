@@ -22,17 +22,18 @@ class ElsClient:
     """A class that implements a Python interface to api.elsevier.com"""
 
     # class variables
-    __url_base = u"https://api.elsevier.com/"  ## Base URL for later use
-    __user_agent = "elsapy-v%s" % version  ## Helps track library use
-    __min_req_interval = 1  ## Min. request interval in sec
-    __ts_last_req = time.time()  ## Tracker for throttling
+    __url_base = u"https://api.elsevier.com/"   # Base URL for later use
+    __user_agent = "elsapy-v%s" % version       # Helps track library use
+    __min_req_interval = 1                      # Min. request interval in sec
+    __ts_last_req = time.time()                 # Tracker for throttling
+    _url_params = {}
 
     # constructors
     def __init__(self, api_key, inst_token = None, num_res = 25, local_dir = None):
         """Initializes a client with a given API Key and, optionally, institutional
             token, number of results per request, and local data path."""
-        self.api_key = api_key
-        self.inst_token = inst_token
+        self._api_key = api_key
+        self._inst_token = inst_token
         self._url_params['count'] = num_res
         if not local_dir:
             self.local_dir = pathlib.Path.cwd() / 'data'
@@ -93,7 +94,7 @@ class ElsClient:
         """Returns the ELSAPI base URL currently configured for the client"""
         return self.__url_base
 
-    def exec_request(self, url_path, args = None):
+    def exec_request_with_params(self, url_path, args = None):
         url = self.__url_base + url_path
 
         if not args is None:
@@ -105,17 +106,18 @@ class ElsClient:
     def exec_request(self, URL):
         """Sends the actual request; returns response."""
 
-        ## Throttle request, if need be
+        # Throttle request, if need be
         interval = time.time() - self.__ts_last_req
         if interval < self.__min_req_interval:
             time.sleep(self.__min_req_interval - interval)
 
-        ## Construct and execute request
+        # Construct and execute request
         headers = {
             "X-ELS-APIKey": self.api_key,
-            "User-Agent": self.__user_agent,
-            "Accept": 'application/json'
+            "User-Agent":   self.__user_agent,
+            "Accept":       'application/json'
         }
+
         if self.inst_token:
             headers["X-ELS-Insttoken"] = self.inst_token
 
@@ -124,6 +126,7 @@ class ElsClient:
             URL,
             headers = headers
         )
+
         self.__ts_last_req = time.time()
         self._status_code = r.status_code
         if r.status_code == 200:
