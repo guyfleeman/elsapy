@@ -97,6 +97,7 @@ class ElsSearch:
 
                 api_response = els_client.exec_request(next_url)
                 results += api_response['search-results']['entry']
+                num_results = len(results)
 
         self._total_num_results = total_num_results
         self._results = results

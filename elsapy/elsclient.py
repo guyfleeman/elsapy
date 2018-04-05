@@ -98,7 +98,7 @@ class ElsClient:
         url = self.__url_base + url_path
 
         if not args is None:
-            url += urlencode(args)
+            url += "?" + urlencode({**self._url_params, **args})
 
         return self.exec_request(url)
 
